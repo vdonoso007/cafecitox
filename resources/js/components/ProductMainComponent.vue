@@ -15,7 +15,8 @@
 
         <div class="row" style="padding: 32px;">
             <div class="col-lg-12">
-                <product-component @created="productCreated" v-if="show" @hideform="hideCreateForm" ></product-component>
+                <transition name="bounce">
+                    <product-component :editproduct="itemtomodify" v-if="show" @created="productCreated" @hideform="hideCreateForm" ></product-component>
                 
                 <div v-else class="table-responsive-lg">
                         <table class="table table-hover">
@@ -31,10 +32,11 @@
                             </thead>
         
                             <tbody>
-                                <products-component v-for="product in products" :key="product.id" :item="product" ></products-component>
+                                <products-component @deleteProduct="deleteProduct" @editProduct="editProduct" v-for="product in products" :key="product.id" :item="product" ></products-component>
                             </tbody>
                         </table>
                 </div>
+                </transition>
                                 
             </div>
         </div>
@@ -42,12 +44,15 @@
 </template>
 
 <script>
-    module.exports = {
+
+module.exports = {
+
         data() {
             return {
                 welcome: 'Bievenidos al mantenimiento de productos',
                 show: false,
-                products: []
+                products: [],
+                itemtomodify: {}
             }
         },
         mounted() {
@@ -61,6 +66,15 @@
                 });
             },
             showProductForm(){
+                this.itemtomodify = {
+                    title: '',
+                    group_id: 0,
+                    name: '',
+                    description: '',
+                    price: '',
+                    stock: '',
+                    image: ''
+                };
                 this.show = !this.show;
             },
             hideCreateForm(flag){
@@ -69,6 +83,14 @@
             productCreated(productItem){
                 this.products.unshift(productItem);
                 this.showProductForm();
+            },
+            editProduct(item){
+                this.itemtomodify = item;
+                this.show = !this.show;
+            },
+            deleteProduct(item){
+                var i = this.products.indexOf(item);
+                this.products.splice(i, 1);
             }
         }
     }

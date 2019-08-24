@@ -83,15 +83,19 @@ class ProductController extends Controller
      * @param  \App\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $productid)
+    public function destroy($productid)
     {
         $product_delete = Product::find($productid);
-        $product_delete->delete();
+        $return_product = $product_delete;
+        $product_delete::where('id', $productid)->delete();
+        return $return_product;
     }
 
     public function allGroups()
     {
-        return ProductGroup::where('enabled', true)->get();
+        return ProductGroup::where('enabled', true)
+                        ->select('id AS group_id', 'name')
+                        ->get();
     }
 
 }

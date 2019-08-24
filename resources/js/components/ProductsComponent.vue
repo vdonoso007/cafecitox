@@ -1,53 +1,54 @@
 <template>
-
-    <tr>
-        <td scope="row">
-                <input v-if="editMode" type="text" class="form-control" v-model="item.title" > </input>
-                <p class="text-left" v-else> {{ item.title }} </p> 
-        </td>
-        <td scope="row">
-                <input v-if="editMode" type="text" class="form-control" v-model="item.name" > </input>
-                <p class="text-left" v-else> {{ item.name }} </p class="text-left"> 
-        </td>
-        <td scope="row">
-                <input v-if="editMode" type="text" class="form-control" v-model="item.price" > </input>
-                <p class="text-left" v-else> {{ item.price }} </p class="text-left"> 
-        </td>
-        <td scope="row">
-                <input v-if="editMode" type="text" class="form-control" v-model="item.stock" > </input>
-                <p class="text-left" v-else> {{ item.stock }} </p class="text-left"> 
-        </td>
-    
-        <td v-on:click="updateProduct()" v-if="editMode" class="cursor-custom"><a><span class="fa fa-eye" aria-hidden="true"></span>&nbsp;<small>Guardar Cambios</small></a></td>
-    
-        <td v-on:click="editProduct()" v-else class="cursor-custom"><a><span class="fa fa-eye" aria-hidden="true"></span>&nbsp;<small>Editar</small></a></td>
+    <transition name="bounce">
+        <tr v-if="show">
+            <td scope="row">
+                    <p class="text-left"> {{ item.title }} </p> 
+            </td>
+            <td scope="row">
+                    <p class="text-left"> {{ item.name }} </p class="text-left"> 
+            </td>
+            <td scope="row">
+                    <p class="text-left"> {{ item.price }} </p class="text-left"> 
+            </td>
+            <td scope="row">
+                    <p class="text-left"> {{ item.stock }} </p class="text-left"> 
+            </td>
         
-        <td id="deleteBtn" v-on:click="deleteProduct()" class="cursor-custom"><span class="fa fa-times" aria-hidden="true"></span>&nbsp;<small>    Eliminar</small></td>
+            <td v-on:click="editProduct()" class="cursor-custom"><a><span class="fa fa-eye" aria-hidden="true"></span>&nbsp;<small>Editar</small></a></td>
             
-    </tr>
-
+            <td id="deleteBtn" v-on:click="deleteProduct()" class="cursor-custom"><span class="fa fa-times" aria-hidden="true"></span>&nbsp;<small>    Eliminar</small></td>
+                
+        </tr>
+    </transition>
+    
 </template>
 
 <script>
     module.exports = {
         props: ['item'],
+        watch: {
+            item: function(val){
+                console.log('esta es ' + val);
+            }
+        },
         data() {
             return {
-                editMode: false
+                editMode: false,
+                show: true
             }
         },
         mounted() {
             console.log('cargado componente productos');
         },
         methods: {
-            updateProduct(){
-
-            },
             editProduct(){
-
+                this.$emit('editProduct', this.item);
             },
             deleteProduct(){
-
+                axios.delete('api/products/' + this.item.id).then((response) => {
+                    this.$emit('deleteProduct', this.item);
+                    this.show=false;
+                });
             }
         }
     }
